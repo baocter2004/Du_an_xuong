@@ -16,19 +16,17 @@ class UserController extends Controller
 
     public function index()
     {
+        try {
+            // phân trang user
+            [$users , $totalPage] = $this->user->paginate($_GET['page'] ?? 1);
 
-        // try {
-        //     for($i = 0 ; $i <= 100 ; $i++){
-        //         $this->user->insert([
-        //             'name' => "Nguyễn Văn A $i",
-        //             'email' => "a$i@gmail.com",
-        //             'password' => password_hash('12345678',PASSWORD_DEFAULT)
-        //         ]);
-        //     }
-        //     die;
-        // } catch (\Throwable $th) {
-        //     Helper::debug($th->getMessage());
-        // }
+            $this->rendViewAdmin('users.index',[
+                'users' => $users,
+                'totalPage' => $totalPage
+            ]);
+        } catch (\Throwable $th) {
+            Helper::debug($th->getMessage());
+        }
     }
 
     public function create()
@@ -47,7 +45,6 @@ class UserController extends Controller
     public function show($id)
     {
         echo __CLASS__ . "@" . __FUNCTION__ . $id;
-
     }
 
     public function edit($id)
