@@ -9,9 +9,19 @@
 //      POST    -> USER/ID      -> UPDATE ($id)   -> LƯU DỮ LIỆU TỪ FORM CẬP NHẬT VÀO DB
 //      GET  -> USER/ID      -> DELETE ($id)   -> XÓA BẢNG
 
+use Dell\DuAnXuong\Controllers\Admin\DashboardController;
 use Dell\DuAnXuong\Controllers\Admin\UserController;
 
+$router->before('GET|POST', '/admin/*.*', function() {
+    if (!isset($_SESSION['user'])) {
+        header('location: ' . url('login') );
+        exit();
+    }
+});
 $router->mount('/admin', function() use ($router) {
+
+    $router->get('/',                        DashboardController::class . '@dashboard');
+    
     // CRUD USER
     $router->mount('/users', function() use ($router) {
         $router->get('/',                     UserController::class . '@index');

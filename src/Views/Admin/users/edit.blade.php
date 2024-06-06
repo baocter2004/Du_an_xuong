@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Mới Người Dùng</title>
+    <title>Cập Nhật User</title>
     <!-- Latest compiled and minified CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -14,7 +14,7 @@
 
 <body>
     <div class="container">
-        <h1>Thêm Mới User : </h1>
+        <h1>Cập Nhật User : </h1>
 
         @if (!empty($_SESSION['errors']))
                 <div class="alert alert-warning">
@@ -30,28 +30,26 @@
                 </div>
         @endif
 
-        <a href="<?= asset(" admin/users/") ?>" class="btn btn-primary">Danh Sách Users</a>
-        <form action="<?= asset("admin/users/store") ?>" enctype="multipart/form-data" method="POST">
+        <a href="<?= asset("admin/users/") ?>" class="btn btn-primary">Danh Sách Users</a>
+        <form action="<?= asset("admin/users/{$user['id']}/update") ?>" enctype="multipart/form-data" method="POST">
             <div class="mb-3 mt-3">
                 <label for="name" class="form-label">Name:</label>
-                <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
+                <input type="text" class="form-control" id="name" placeholder="Enter name" name="name"
+                    value="<?=$user['name']?>">
             </div>
             <div class="mb-3 mt-3">
                 <label for="email" class="form-label">Email:</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+                <input type="email" class="form-control" id="email" placeholder="Enter email" name="email"
+                    value="<?=$user['email']?>">
             </div>
             <div class="mb-3 mt-3">
                 <label for="avatar" class="form-label">Avatar:</label>
                 <input type="file" class="form-control" id="avatar" placeholder="Enter avatar" name="avatar">
+                <img src="{{ asset($user['avatar']) }}" alt="" width="100px">
             </div>
             <div class="mb-3 mt-3">
                 <label for="password" class="form-label">Password:</label>
                 <input type="text" class="form-control" id="password" placeholder="Enter password" name="password">
-            </div>
-            <div class="mb-3 mt-3">
-                <label for="confirm_password" class="form-label">confirm_password:</label>
-                <input type="text" class="form-control" id="confirm_password" placeholder="Enter password"
-                    name="confirm_password">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>

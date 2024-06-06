@@ -2,10 +2,11 @@
 
 namespace Dell\DuAnXuong\Controllers\Admin;
 
-use Dell\DuAnXuong\Commons\Controller;
-use Dell\DuAnXuong\Commons\Helper;
+use Exception;
 use Dell\DuAnXuong\Models\User;
 use Rakit\Validation\Validator;
+use Dell\DuAnXuong\Commons\Helper;
+use Dell\DuAnXuong\Commons\Controller;
 
 class UserController extends Controller
 {
@@ -32,95 +33,190 @@ class UserController extends Controller
 
     public function create()
     {
-        $this->rendViewAdmin('users.create');
+        try {
+            $this->rendViewAdmin('users.create');
+        } catch (\Throwable $th) {
+            Helper::debug($th->getMessage());
+        }
     }
 
     public function store()
     {
-        $validator = new Validator;
+        try {
+            $validator = new Validator;
 
-        // make it
-        $validation = $validator->make($_POST + $_FILES, [
-            'name'                  => 'required|max:50',
-            'email'                 => 'required|email',
-            'password'              => 'required|min:6',
-            'confirm_password'      => 'required|same:password',
-            'avatar'                => 'required|uploaded_file:0,2M,png,jpeg,jpg',
-        ]);
+            // make it
+            $validation = $validator->make($_POST + $_FILES, [
+                'name' => 'required|max:50',
+                'email' => 'required|email',
+                'password' => 'required|min:6',
+                'confirm_password' => 'required|same:password',
+                'avatar' => 'required|uploaded_file:0,2M,png,jpeg,jpg',
+            ]);
 
-        $validation->validate();
+            $validation->validate();
 
-        if ($validation->fails()) {
-            $_SESSION['errors'] = $validation->errors()->firstOfAll();
+            if ($validation->fails()) {
+                $_SESSION['errors'] = $validation->errors()->firstOfAll();
 
+                header('Location: ' . url('admin/users/create'));
+                exit();
+            } else {
+                $data = [
+                    'name' => $_POST['name'],
+                    'email' => $_POST['email'],
+                    'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+                ];
 
-            header('Location: ' . url('admin/users/create'));
-            exit();
-        } else {
-            $data = [
-                'name'     => $_POST['name'],
-                'email'    => $_POST['email'],
-                'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
-            ];
+                if (isset($_FILES['avatar']) && $_FILES['avatar']['size'] > 0) {
 
-            if (isset($_FILES['avatar']) && $_FILES['avatar']['size'] > 0) {
+                    $from = $_FILES['avatar']['tmp_name'];
+                    $to = 'assets/uploads/' . time() . $_FILES['avatar']['name'];
 
-                $from = $_FILES['avatar']['tmp_name'];
-                $to = 'assets/uploads/' . time() . $_FILES['avatar']['name'];
+                    if (move_uploaded_file($from, PATH_ROOT . $to)) {
+                        $data['avatar'] = $to;
+                    } else {
+                        $_SESSION['errors']['avatar'] = 'Upload Không thành công';
 
-                if (move_uploaded_file($from, PATH_ROOT . $to)) {
-                    $data['avatar'] = $to;
-                } else {
-                    $_SESSION['errors']['avatar'] = 'Upload Không thành công';
-
-                    header('Location: ' . url('admin/users/create'));
-                    exit;
+                        header('Location: ' . url('admin/users/create'));
+                        exit;
+                    }
                 }
+
+                $this->user->insert($data);
+
+                $_SESSION['status'] = true;
+                $_SESSION['msg'] = 'Thao tác thành công';
+
+                header('Location: ' . url('admin/users'));
+                exit;
             }
-            
-            $this->user->insert($data);
-
-            $_SESSION['status'] = true;
-            $_SESSION['msg'] = 'Thao tác thành công';
-
-            header('Location: ' . url('admin/users'));
-            exit;
+        } catch (\Throwable $th) {
+            Helper::debug($th->getMessage());
         }
     }
 
 
     public function show($id)
     {
-        $user = $this->user->findById($id);
+        try {
+            $user = $this->user->findById($id);
 
-        $this->rendViewAdmin('users.show', [
-            'user' => $user
-        ]);
+            $this->rendViewAdmin('users.show', [
+                'user' => $user
+            ]);
+        } catch (\Throwable $th) {
+            Helper::debug($th->getMessage());
+        }
     }
 
     public function edit($id)
     {
-        echo __CLASS__ . "@" . __FUNCTION__ . $id;
+        try {
+            $user = $this->user->findById($id);
+
+            if (empty($user)) {
+                throw new Exception("Model not found");
+            }
+
+            $this->rendViewAdmin('users.edit', [
+                'user' => $user
+            ]);
+        } catch (\Throwable $th) {
+            Helper::debug($th->getMessage());
+        }
     }
 
     public function update($id)
     {
-        echo __CLASS__ . "@" . __FUNCTION__ . $id;
+        try {
+
+            $user = $this->user->findById($id);
+
+            $validator = new Validator;
+
+            // make it
+            $validation = $validator->make($_POST + $_FILES, [
+                'name' => 'required|max:50',
+                'email' => 'required|email',
+                'password' => 'min:6',
+                'confirm_password' => 'required|same:password',
+                'avatar' => 'required|uploaded_file:0,2M,png,jpeg,jpg',
+            ]);
+
+            $validation->validate();
+
+            if ($validation->fails()) {
+                // thông báo lỗi để gửi ra trang index 
+                $_SESSION['errors'] = $validation->errors()->firstOfAll();
+
+                header('Location: ' . url("admin/users/{$user['id']}/edit"));
+                exit();
+            } else {
+                // data để POST lên db
+                $data = [
+                    'name' => $_POST['name'],
+                    'email' => $_POST['email'],
+                    // nếu chưa có password thì giữ password cũ và băm nó ra
+                    'password' => !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : $user['password']
+                ];
+                // mặc định là không upload
+                $flagUpload = false;
+                // kiểm tra xem file đã có ảnh chưa
+                if (isset($_FILES['avatar']) && $_FILES['avatar']['size'] > 0) {
+                    // đã upload
+                    $flagUpload = true;
+
+                    $from = $_FILES['avatar']['tmp_name'];
+                    $to = 'assets/uploads/' . time() . $_FILES['avatar']['name'];
+
+                    if (move_uploaded_file($from, PATH_ROOT . $to)) {
+                        $data['avatar'] = $to;
+                    } else {
+                        $_SESSION['errors']['avatar'] = 'Upload Không thành công';
+
+                        header('Location: ' . url("admin/users/{$user['id']}/edit"));
+                        exit;
+                    }
+                }
+
+                $this->user->update($id, $data);
+
+                // xóa file ảnh trước đây
+                if (
+                    $flagUpload
+                    && $user['avatar']
+                    && file_exists(PATH_ROOT . $user['avatar'])
+                ) {
+                    unlink(PATH_ROOT . $user['avatar']);
+                }
+
+                $_SESSION['status'] = true;
+                $_SESSION['msg'] = 'Thao tác thành công';
+
+                header('Location: ' . url("admin/users/{$user['id']}/edit"));
+                exit;
+            }
+        } catch (\Throwable $th) {
+            Helper::debug($th->getMessage());
+        }
     }
 
     public function delete($id)
     {
-
-        // $this->user->delete($id);
-        // header('location: ' . url('admin/users'));
-
-        // url('admin/users');
-        // header("Location : " . $_ENV['BASE_URL'].  'admin/users');
-
-        // echo 'delete id : ' . $id;
-
         try {
+
+            $user = $this->user->findById($id);
+
             $this->user->delete($id);
+
+            if (
+                $user['avatar']
+                && file_exists(PATH_ROOT . $user['avatar'])
+            ) {
+                unlink(PATH_ROOT . $user['avatar']);
+            }
+
             header('location: ' . url('admin/users'));
             exit();
         } catch (\Throwable $th) {
