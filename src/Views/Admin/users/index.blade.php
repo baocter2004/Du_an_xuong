@@ -96,19 +96,20 @@ Danh sách User
     </div>
     <nav>
         <ul class="pagination justify-content-center">
-
             <li class="page-item <?= ($_GET['page'] ?? 1) <= 1 ? 'disabled' : '' ?>">
                 <a href="<?= url('admin/users/?page=' . (($_GET['page'] ?? 1) - 1)) ?>" class="page-link">&laquo;</a>
             </li>
 
-            @for ($i = max(1, ($_GET['page'] ?? 1) - 2); $i <= min($totalPage, ($_GET['page'] ?? 1) + 2); $i++) <li class="page-item <?= $i == ($_GET['page'] ?? 1) ? 'active' : '' ?>">
-                <a href="<?= url('admin/users/?page=' . $i) ?>" class="page-link"><?= $i ?></a>
+            <!-- i = 1 (max) ; i <= 4 ; i++ -->
+            @for ($i = max(1, ($_GET['page'] ?? 1) - 2); $i <= min($totalPage, ($_GET['page'] ?? 1) + 2); $i++) 
+                <li class="page-item <?= $i == ($_GET['page'] ?? 1) ? 'active' : '' ?>">
+                    <a href="<?= url('admin/users/?page=' . $i) ?>" class="page-link"><?= $i ?></a>
                 </li>
-                @endfor
+            @endfor
 
-                <li class="page-item <?= ($_GET['page'] ?? 1) >= $totalPage ? 'disabled' : '' ?>">
-                    <a href="<?= url('admin/users/?page=' . (($_GET['page'] ?? 1) + 1)) ?>" class="page-link">&raquo;</a>
-                </li>
+            <li class="page-item <?= ($_GET['page'] ?? 1) >= $totalPage ? 'disabled' : '' ?>">
+                <a href="<?= url('admin/users/?page=' . (($_GET['page'] ?? 1) + 1)) ?>" class="page-link">&raquo;</a>
+            </li>    
         </ul>
     </nav>
 </div>

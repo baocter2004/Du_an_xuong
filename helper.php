@@ -13,3 +13,12 @@ if (!function_exists('url')) {
         return $_ENV['BASE_URL'] . $uri;
     }
 }
+
+if (!function_exists('auth_check')) {
+    function auth_check() {
+        if (isset($_SESSION['user'])) {
+            header('Location: ' . url('admin/') );
+            exit;
+        }
+    }
+}
