@@ -19,8 +19,7 @@
                 <div class="header_right d-flex justify-content-between align-items-center">
                     <div class="header_notification_warp d-flex align-items-center">
                         <li>
-                            <a class="bell_notification_clicker nav-link-notify" href="#"> <img
-                                    src="{{ asset('assets/admin/img/icon/bell.svg') }}" alt>
+                            <a class="bell_notification_clicker nav-link-notify" href="#"> <img src="{{ asset('assets/admin/img/icon/bell.svg') }}" alt>
                             </a>
 
                             <div class="Menu_NOtification_Wrap">
@@ -110,24 +109,29 @@
 
                         </li>
                         <li>
-                            <a class="CHATBOX_open nav-link-notify" href="#"> <img
-                                    src="{{ asset('assets/admin/img/icon/msg.svg') }}" alt> </a>
+                            <a class="CHATBOX_open nav-link-notify" href="#"> <img src="{{ asset('assets/admin/img/icon/msg.svg') }}" alt> </a>
                         </li>
                     </div>
-                    <div class="profile_info">
-                        <img src="{{ asset('assets/admin/img/client_img.png') }}" alt="#">
-                        <div class="profile_info_iner">
-                            <div class="profile_author_name">
-                                <p>Neurologist </p>
-                                <h5>Dr. Robar Smith</h5>
-                            </div>
-                            <div class="profile_info_details">
-                                <a href="#">My Profile </a>
-                                <a href="#">Settings</a>
-                                <a href="#">Log Out </a>
+                    <nav>
+                        @if (!isset($_SESSION['user']))
+                        <a class="btn btn-primary" href="{{ url('login') }}">Login</a>
+                        @endif
+
+                        @if (isset($_SESSION['user']))
+                        <div class="profile_info">
+                            <img src="<?= url($_SESSION['user']['avatar']) ?>" alt="#">
+                            <div class="profile_info_iner">
+                                <div class="profile_author_name">
+                                    <h5><?= $_SESSION['user']['name'] ?></h5>
+                                </div>
+                                <div class="profile_info_details">
+                                    <a href="">My Profile </a>
+                                    <a href="<?= url('logout') ?>">Log Out </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        @endif
+                    </nav>
                 </div>
             </div>
         </div>

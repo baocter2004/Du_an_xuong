@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.master')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Tiết Người DÙng</title>
-    <!-- Latest compiled and minified CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('title')
+Thông Tin chi tiết
+@endsection
 
-    <!-- Latest compiled JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-
-<body>
-    <div class="container">
+@section('content')
+<div class="container">
         <h1>Chi Tiết User : <?=$user['name']?></h1>
         <table class="table table-striped">
             <thead>
@@ -32,6 +24,4 @@
             </tbody>
         </table>
     </div>
-</body>
-
-</html>
+@endsection

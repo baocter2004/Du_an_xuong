@@ -14,14 +14,14 @@
                 <span>Dashboard</span>
             </a>
             <ul>
-                <li><a class="active" href="index-2.html">Sales</a></li>
-                <li><a href="index_2.html">Default</a></li>
-                <li><a href="index_3.html">Dark Menu</a></li>
+                <li><a class="active" href="<?= asset('admin/products') ?>">Products</a></li>
+                <li><a href="<?= asset('admin/users') ?>">Users</a></li>
+                <li><a href="<?= asset('admin/categories') ?>">Categories</a></li>
             </ul>
         </li>
 
         <li class>
-            <a href="Board.html" aria-expanded="false">
+            <a href="<?= asset('admin/') ?>" aria-expanded="false">
                 <div class="icon_menu">
                     <img src="{{ asset('assets/admin/img/menu-icon/5.svg') }}" alt>
                 </div>

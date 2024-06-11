@@ -19,10 +19,12 @@
         <div class="row">
             <h1 class="mb-3 mb-5 text-align-center">Form Login</h1>
             <?php
-            if($_SESSION['user']) {
-                header("Location: ".url(''));
+
+            if(!empty($_SESSION['user'])) {
+                header("Location: " . url(''));
                 exit;
             }
+            
             if (!empty($_SESSION['error'])) { ?>
                 <div class="alert alert-warning mt-3 mb-3">
                     <?= $_SESSION['error'] ?>

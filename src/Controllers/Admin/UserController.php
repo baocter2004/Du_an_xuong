@@ -26,6 +26,7 @@ class UserController extends Controller
                 'users' => $users,
                 'totalPage' => $totalPage
             ]);
+
         } catch (\Throwable $th) {
             Helper::debug($th->getMessage());
         }
@@ -66,6 +67,8 @@ class UserController extends Controller
                     'name' => $_POST['name'],
                     'email' => $_POST['email'],
                     'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
+                    'type' => $_POST['type'],
+                    'is_active' => $_POST['is_active']
                 ];
 
                 if (isset($_FILES['avatar']) && $_FILES['avatar']['size'] > 0) {
@@ -105,6 +108,10 @@ class UserController extends Controller
             $this->rendViewAdmin('users.show', [
                 'user' => $user
             ]);
+
+            $this->rendViewAdmin('layouts.partials.topbar',[
+                'user' => $user
+            ]);
         } catch (\Throwable $th) {
             Helper::debug($th->getMessage());
         }
@@ -140,8 +147,6 @@ class UserController extends Controller
                 'name' => 'required|max:50',
                 'email' => 'required|email',
                 'password' => 'min:6',
-                'confirm_password' => 'required|same:password',
-                'avatar' => 'required|uploaded_file:0,2M,png,jpeg,jpg',
             ]);
 
             $validation->validate();
@@ -158,7 +163,9 @@ class UserController extends Controller
                     'name' => $_POST['name'],
                     'email' => $_POST['email'],
                     // nếu chưa có password thì giữ password cũ và băm nó ra
-                    'password' => !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : $user['password']
+                    'password' => !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : $user['password'],
+                    'type'=> $_POST['type'],
+                    'is_active' => $_POST['is_active']
                 ];
                 // mặc định là không upload
                 $flagUpload = false;

@@ -9,7 +9,7 @@ if (!function_exists('asset')) {
 }
 
 if (!function_exists('url')) {
-    function url($uri) {
+    function url($uri=null) {
         return $_ENV['BASE_URL'] . $uri;
     }
 }

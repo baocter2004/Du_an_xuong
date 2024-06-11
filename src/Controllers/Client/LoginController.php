@@ -25,21 +25,27 @@ class LoginController extends Controller
             $user = $this->user->findByEmail($_POST['email']);
 
             if (empty($user)) {
-                throw new \Exception('Không Tồn Tại Email : '. $_POST['email']);
+                throw new \Exception('Không Tồn Tại Email : ' . $_POST['email']);
             }
 
             $flag = password_verify($_POST['password'], $user['password']);
-            
+
             if ($flag) {
 
                 $_SESSION['user'] = $user;
 
-                header('Location: ' . url('admin/') );
+                unset($_SESSION['cart']);
+
+                if ($user['type'] == 'admin') {
+                    header('Location: ' . url('admin/'));
+                    exit;
+                }
+
+                header('Location: ' . url(''));
                 exit;
             }
             // Helper::debug($user);
             throw new \Exception('password không đúng');
-
         } catch (\Throwable $th) {
             $_SESSION['error'] = $th->getMessage();
 
@@ -50,9 +56,12 @@ class LoginController extends Controller
     }
 
 
-    public function logout() {
+    public function logout()
+    {
+        unset($_SESSION['cart-' . $_SESSION['user']['id']]);
+
         unset($_SESSION['user']);
 
-        header("Location: ".url(''));
+        header("Location: " . url(''));
     }
 }
